@@ -24,4 +24,4 @@ perl break.pl < recs.txt > recstemp.txt
 
 db_load -c duplicates=1 -T -f recstemp.txt -t hash re.idx
 
-rm datestemp.txt recstemp.txt 
+rm datestemp.txt recstemp.txt emailstemp.txt termstemp.txt
