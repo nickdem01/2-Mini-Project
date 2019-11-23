@@ -19,6 +19,13 @@ def create_files():
     recs_file = open("recs.txt", "w")
     recs_file.close()
 
+    emails_file = open("emails.txt", "w")
+    emails_file.close()
+
+    terms_file = open("terms.txt", "w")
+    terms_file.close()
+    
+    
     for line in fp:
         line_list = re.split("[<>]+", line)
         for i in range(len(line_list)):
