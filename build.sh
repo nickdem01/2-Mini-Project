@@ -14,11 +14,11 @@ db_load -c duplicates=1 -T -f datestemp.txt -t btree da.idx
 
 perl break.pl < emails.txt > emailstemp.txt
 
-dbload -c duplicates=1 -T -f emailstemp.txt -t btree em.idx
+db_load -c duplicates=1 -T -f emailstemp.txt -t btree em.idx
 
 perl break.pl < terms.txt > termstemp.txt
 
-dbload -c duplicates=1 -T -f termstemp.txt -t btree te.idx
+db_load -c duplicates=1 -T -f termstemp.txt -t btree te.idx
 
 perl break.pl < recs.txt > recstemp.txt
 
