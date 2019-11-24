@@ -187,10 +187,6 @@ def query_search_emails(type, email):
         if column[0].decode("utf-8") == email:
             emails_list.append(column[1].decode("utf-8"))
             
-            dup = cur.next_dup()
-            while(dup!=None):
-                emails_list.append(column[1].decode("utf-8"))
-                dup = cur.next_dup()
 
         iter = cur.next()
     
