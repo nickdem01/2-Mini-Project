@@ -77,7 +77,7 @@ def write_terms(text, row_num, terms_file, context):
 
     terms_file = open("terms.txt", "a")
     
-    body = re.split('[\s|; |, |: |( |) |\ |/ |? |\.]', text)
+    body = re.split('[\s|; |, |: |( |) |\ |/ |? |! |\.]', text)
 
     for i in range(len(body)):
   
