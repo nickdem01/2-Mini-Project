@@ -32,6 +32,14 @@ def main():
         for i in range(len(query_list)):
 
             if query_list[i] in operators:
+                
+                if (query_list[i - 1].lower() == "to" or query_list[i -1].lower() == "from" or query_list[i -1].lower() == "bcc" or query_list[i -1].lower() == "cc"):
+                    terms_list = query_search_terms(query_list[i - 1], query_list[i + 1])
+                    if len(id_list) == 0:
+                        id_list = id_list + terms_list 
+                    else:
+                        id_list = list(set(id_list).intersection(terms_list))
+                        
                 if (query_list[i - 1].lower() == "subj" or query_list[i -1].lower() == "body"):
                     terms_list = query_search_terms(query_list[i - 1], query_list[i + 1])
                     if len(id_list) == 0:
