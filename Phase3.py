@@ -40,6 +40,13 @@ def main():
                     else:
                         id_list = list(set(id_list).intersection(emails_list))
                         
+                if (query_list[i - 1].lower() == "date"):
+                    dates_list = query_search_terms(query_list[i - 1], query_list[i + 1], query_list[i])
+                    if len(id_list) == 0:
+                        id_list = id_list + dates_list 
+                    else:
+                        id_list = list(set(id_list).intersection(dates_list))
+                        
                 if (query_list[i - 1].lower() == "subj" or query_list[i -1].lower() == "body"):
                     terms_list = query_search_terms(query_list[i - 1], query_list[i + 1])
                     if len(id_list) == 0:
