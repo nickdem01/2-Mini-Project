@@ -32,6 +32,14 @@ def main():
         for i in range(len(query_list)):
 
             if query_list[i] in operators:
+                
+                if (query_list[i - 1].lower() == "to" or query_list[i -1].lower() == "from" or query_list[i -1].lower() == "bcc" or query_list[i -1].lower() == "cc"):
+                    terms_list = query_search_terms(query_list[i - 1], query_list[i + 1])
+                    if len(id_list) == 0:
+                        id_list = id_list + terms_list 
+                    else:
+                        id_list = list(set(id_list).intersection(terms_list))
+                        
                 if (query_list[i - 1].lower() == "subj" or query_list[i -1].lower() == "body"):
                     terms_list = query_search_terms(query_list[i - 1], query_list[i + 1])
                     if len(id_list) == 0:
@@ -152,7 +160,42 @@ def query_search_recs(output_type, id_list):
 
     return
 
+def query_search_emails(type, email):
+    
+    DB_FILE = "em.idx"
+    database = db.DB()
+    database.open(DB_FILE, None, db.DB_BTREE, db.DB_RDONLY)
+    cur = database.cursor()
 
+    emails_list = []
+    
+    if type.lower() == "cc":
+        email = "cc-" + email.lower()
+        
+    elif type.lower() == "to":
+        email = "to-" + email.lower() 
+    
+    elif type.lower() == "bcc":
+        email = "bcc-" + email.lower() 
+    
+    elif type.lower() == "from":
+        email = "from-" + email.lower()     
+            
+    iter = cur.first()
+    while(iter):
+        column = iter
+        if column[0].decode("utf-8") == email:
+            emails_list.append(column[1].decode("utf-8"))
+            
+            dup = cur.next_dup()
+            while(dup!=None):
+                emails_list.append(column[1].decode("utf-8"))
+                dup = cur.next_dup()
+
+        iter = cur.next()
+    
+    database.close()
+    return emails_list
 
 if __name__ == "__main__":
     main()
