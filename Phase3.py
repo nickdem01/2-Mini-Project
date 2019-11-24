@@ -83,17 +83,11 @@ def query_search_terms(type, term):
         elif type.lower() == "body":
             term = "b-" + term.lower()
 
-        iter = cur.set_range(term.encode("utf-8"))
+        iter = cur.first()
         while(iter):
             column = iter
             if column[0].decode("utf-8") == term:
                 terms_list.append(column[1].decode("utf-8"))
-            
-                dup = cur.next_dup()
-                while(dup!=None):
-                    terms_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
-                break
             
             iter = cur.next()
 
@@ -103,19 +97,11 @@ def query_search_terms(type, term):
         elif type.lower() == "body":
             term = "b-" + term[:-1].lower()
 
-
-        iter = cur.set_range(term.encode("utf-8"))
+        iter = cur.first()
         while(iter):
             column = iter
-            
             if column[0].decode("utf-8").startswith(term):
                 terms_list.append(column[1].decode("utf-8"))
-
-                dup = cur.next_dup()
-                while(dup!=None):
-                    terms_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
-                break
         
             iter = cur.next()
     
@@ -206,6 +192,51 @@ def query_search_emails(type, email):
     
     database.close()
     return emails_list
+
+
+def query_search_dates(type, date, opr):
+        
+    DB_FILE = "da.idx"
+    database = db.DB()
+    database.open(DB_FILE, None, db.DB_BTREE, db.DB_RDONLY)
+    cur = database.cursor()
+    
+    dates_list = []
+    
+                
+    iter = cur.first()
+    while(iter):
+        column = iter
+        if opr == '>':
+            
+            if column[0].decode("utf-8") > date:
+                dates_list.append(column[1].decode("utf-8"))
+                
+        if opr == '<':
+                    
+            if column[0].decode("utf-8") < date:
+                dates_list.append(column[1].decode("utf-8"))
+                
+        if opr == '>=':
+                    
+            if column[0].decode("utf-8") >= date:
+                dates_list.append(column[1].decode("utf-8"))
+                
+        if opr == '<=':
+                    
+            if column[0].decode("utf-8") <= date:
+                dates_list.append(column[1].decode("utf-8"))
+
+
+        if opr == ':':
+                    
+            if column[0].decode("utf-8") == date:
+                dates_list.append(column[1].decode("utf-8"))
+
+        iter = cur.next()
+        
+    database.close()
+    return dates_list
 
 if __name__ == "__main__":
     main()
