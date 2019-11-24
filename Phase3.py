@@ -202,7 +202,7 @@ def query_search_emails(type, email):
     elif type.lower() == "from":
         email = "from-" + email.lower()     
             
-    iter = cur.set_range(term.encode("utf-8"))
+    iter = cur.set_range(email.encode("utf-8"))
     while(iter):
         column = iter
         if column[0].decode("utf-8") == email:
@@ -229,7 +229,7 @@ def query_search_dates(type, date, opr):
     dates_list = []
     
                 
-    iter = cur.set_range(term.encode("utf-8"))
+    iter = cur.set_range(date.encode("utf-8"))
     while(iter):
         column = iter
         if opr == '>':
