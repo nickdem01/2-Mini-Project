@@ -83,11 +83,17 @@ def query_search_terms(type, term):
         elif type.lower() == "body":
             term = "b-" + term.lower()
 
-        iter = cur.first()
+        iter = cur.set_range(term.encode("utf-8"))
         while(iter):
             column = iter
             if column[0].decode("utf-8") == term:
                 terms_list.append(column[1].decode("utf-8"))
+            
+                dup = cur.next_dup()
+                while(dup!=None):
+                    terms_list.append(dup[1].decode("utf-8"))
+                    dup = cur.next_dup()
+                break
             
             iter = cur.next()
 
@@ -97,11 +103,19 @@ def query_search_terms(type, term):
         elif type.lower() == "body":
             term = "b-" + term[:-1].lower()
 
-        iter = cur.first()
+
+        iter = cur.set_range(term.encode("utf-8"))
         while(iter):
             column = iter
+            
             if column[0].decode("utf-8").startswith(term):
                 terms_list.append(column[1].decode("utf-8"))
+
+                dup = cur.next_dup()
+                while(dup!=None):
+                    terms_list.append(dup[1].decode("utf-8"))
+                    dup = cur.next_dup()
+                break
         
             iter = cur.next()
     
