@@ -73,7 +73,7 @@ def query_search_terms(type, term):
         if type.lower() == "subj":
             term = "s-" + term.lower()
         elif type.lower() == "body":
-            term = "d-" + term.lower()
+            term = "b-" + term.lower()
 
         iter = cur.first()
         while(iter):
@@ -81,30 +81,20 @@ def query_search_terms(type, term):
             if column[0].decode("utf-8") == term:
                 terms_list.append(column[1].decode("utf-8"))
             
-                dup = cur.next_dup()
-                while(dup!=None):
-                    terms_list.append(column[1].decode("utf-8"))
-                    dup = cur.next_dup()
-
             iter = cur.next()
 
     elif term[-1:] == "%":
         if type.lower() == "subj":
             term = "s-" + term[:-1].lower()
         elif type.lower() == "body":
-            term = "d-" + term[:-1].lower()
+            term = "b-" + term[:-1].lower()
 
         iter = cur.first()
         while(iter):
             column = iter
-            if term.startswith(column[0].decode("utf-8")):
+            if column[0].decode("utf-8").startswith(term):
                 terms_list.append(column[1].decode("utf-8"))
-            
-                dup = cur.next_dup()
-                while(dup!=None):
-                    terms_list.append(column[1].decode("utf-8"))
-                    dup = cur.next_dup()
-
+        
             iter = cur.next()
     
     
@@ -115,47 +105,49 @@ def query_search_terms(type, term):
 def query_search_recs(output_type, id_list):
     DB_FILE = "re.idx"
     database = db.DB()
-    database.open(DB_FILE, None, db.DB_BTREE, db.DB_RDONLY)
-    cur = database.cursor()
+    database.open(DB_FILE, None, db.DB_HASH, db.DB_RDONLY)
 
     if output_type == "brief":
-        for id in id_list:
-            result = cur.set(id.encode("utf-8"))
-            info = result[1].decode("utf-8")
-            info = re.split("[<>]+", info)
-            for i in range(len(info)):
-                if info[i - 1] == "subj" and info[i + 1] == "/subj":
-                    print("Row id: ", id, "Subject: ", info[i])
+        subject = ""
 
-    elif output_type == "full":
         for id in id_list:
-            date = ""
-            subject = ""
-            from_email = ""
-            to_email = ""
-            body = ""
-            cc = ""
-            bcc =""
-
-            result = cur.set(id.encode("utf-8"))
-            info = result[1].decode("utf-8")
+            result = database.get(id.encode("utf-8"))
+            info = result.decode("utf-8")
             info = re.split("[<>]+", info)
             for i in range(len(info)):
                 if info[i - 1] == "subj" and info[i + 1] == "/subj":
                     subject = info[i]
-                elif info[i - 1] == "date" and info[i + 1] == "/date":
-                    date = info[i]
+
+            print("Row id:", id, "Subject:", subject, "\n")
+            subject = ""
+
+    elif output_type == "full":
+        for id in id_list:
+            term_list = ["", "", "", "", "", "", ""]
+
+            result = database.get(id.encode("utf-8"))
+            info = result.decode("utf-8")
+            info = re.split("[<>]+", info)
+            for i in range(len(info)):
+                if info[i - 1] == "date" and info[i + 1] == "/date":
+                    term_list[0] = info[i]
+                elif info[i - 1] == "subj" and info[i + 1] == "/subj":
+                    term_list[1] = info[i]
                 elif info[i - 1] == "from" and info[i + 1] == "/from":
-                    from_email = info[i]
+                    term_list[2] = info[i]
                 elif info[i - 1] == "to" and info[i + 1] == "/to":
-                    to_email = info[i]
+                    term_list[3] = info[i]
                 elif info[i - 1] == "body" and info[i + 1] == "/body":
-                    body = info[i]
+                    term_list[4] = info[i]
                 elif info[i - 1] == "cc" and info[i + 1] == "/cc":
-                    cc = info[i]
+                    term_list[5] = info[i]
                 elif info[i - 1] == "bcc" and info[i + 1] == "/bcc":
-                    bcc = info[i]
-            print("Row id: ", id, "Date: ", date, "From: ", from_email, "To: ", to_email, "Subject: ", subject, "Body: ", body, "cc: ", cc, "bcc: ", bcc)
+                    term_list[6] = info[i]
+
+            print("Row id:", id, "Date:", term_list[0], "From:", term_list[2], "To:", term_list[3], 
+            "Subject:", term_list[1], "Body:", term_list[4], "cc:", term_list[5], "bcc:", term_list[6], "\n")
+
+            term_list = ["", "", "", "", "", "", ""]
 
 
     return
