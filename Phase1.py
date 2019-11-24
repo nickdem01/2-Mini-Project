@@ -77,30 +77,31 @@ def write_terms(text, row_num, terms_file, context):
 
     terms_file = open("terms.txt", "a")
     
-    body = re.split('[\s|; |, |: |( |) |\ |/ |? |! |\" |\' |{ |} |\[ |\] |* |@ |\.]', text)
+    body = re.split('[\s|; |, |: |( |) |\ |/ |? |! |\" |\' |{ |} |\[ |\] |* |@ |% |& |# |$ |\.]', text)
 
     for i in range(len(body)):
   
         term = body[i].lower()
-        if(len(body[i]) > 2 and body[i][0] != '&'):
+        
+        if(len(body[i]) > 2 and body[i] != 'apos' and body[i] != 'quot' and body[i] != 'amp'):
             
-            if(body[i].isalnum() == False):
+            #if(body[i].isalnum() == False):
                  
-                temp = body[i].split("&")
-                body[i] = temp[0]	
-                valid = 0
-                for b in range(len(body[i])):
+                #temp = body[i].split("&")
+                #body[i] = temp[0]	
+                #valid = 0
+                #for b in range(len(body[i])):
 
-                    if((body[i][b] != '-' or body[i][b] != '_') and len(body[i]) <= 2):
+                    #if((body[i][b] != '-' or body[i][b] != '_') and len(body[i]) <= 2):
        
-                        valid = 1
+                        #valid = 1
                         
-                if(valid == 0):
-                   term = body[i].lower()                
-                   terms_file.write(context[0] + '-' + term + ':' + row_num +  "\n")
-            else:
-                terms_file.write(context[0] + '-' + term + ':' + row_num  + "\n")
-    
+                #if(valid == 0):
+                   #term = body[i].lower()                
+                   #terms_file.write(context[0] + '-' + term + ':' + row_num +  "\n")
+            #else:
+                #terms_file.write(context[0] + '-' + term + ':' + row_num  + "\n")
+            terms_file.write(context[0] + '-' + term + ':' + row_num  + "\n")
 
     terms_file.close()
 
