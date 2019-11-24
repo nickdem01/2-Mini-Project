@@ -34,11 +34,11 @@ def main():
             if query_list[i] in operators:
                 
                 if (query_list[i - 1].lower() == "to" or query_list[i -1].lower() == "from" or query_list[i -1].lower() == "bcc" or query_list[i -1].lower() == "cc"):
-                    terms_list = query_search_terms(query_list[i - 1], query_list[i + 1])
+                    emails_list = query_search_emails(query_list[i - 1], query_list[i + 1])
                     if len(id_list) == 0:
-                        id_list = id_list + terms_list 
+                        id_list = id_list + emails_list 
                     else:
-                        id_list = list(set(id_list).intersection(terms_list))
+                        id_list = list(set(id_list).intersection(emails_list))
                         
                 if (query_list[i - 1].lower() == "subj" or query_list[i -1].lower() == "body"):
                     terms_list = query_search_terms(query_list[i - 1], query_list[i + 1])
@@ -201,10 +201,6 @@ def query_search_emails(type, email):
         if column[0].decode("utf-8") == email:
             emails_list.append(column[1].decode("utf-8"))
             
-            dup = cur.next_dup()
-            while(dup!=None):
-                emails_list.append(column[1].decode("utf-8"))
-                dup = cur.next_dup()
 
         iter = cur.next()
     
