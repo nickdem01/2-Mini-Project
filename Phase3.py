@@ -35,38 +35,43 @@ def main():
                 
                 if (query_list[i - 1].lower() == "to" or query_list[i -1].lower() == "from" or query_list[i -1].lower() == "bcc" or query_list[i -1].lower() == "cc"):
                     emails_list = query_search_emails(query_list[i - 1], query_list[i + 1])
-                    if len(id_list) == 0:
-                        id_list = id_list + emails_list 
-                    else:
-                        id_list = list(set(id_list).intersection(emails_list))
+                    id_list = intersect_lists(id_list, emails_list)
                         
                 if (query_list[i - 1].lower() == "date"):
-                    dates_list = query_search_terms(query_list[i - 1], query_list[i + 1], query_list[i])
-                    if len(id_list) == 0:
-                        id_list = id_list + dates_list 
-                    else:
-                        id_list = list(set(id_list).intersection(dates_list))
+                    dates_list = query_search_dates(query_list[i + 1], query_list[i])
+                    id_list = intersect_lists(id_list, dates_list)
                         
                 if (query_list[i - 1].lower() == "subj" or query_list[i -1].lower() == "body"):
                     terms_list = query_search_terms(query_list[i - 1], query_list[i + 1])
-                    if len(id_list) == 0:
-                        id_list = id_list + terms_list # if list is empty we add our first values to it
-                    else:
-                        id_list = list(set(id_list).intersection(terms_list)) # We use intersect on the lists to get the shared row ids
+                    id_list = intersect_lists(id_list, terms_list)
 
             elif query_list[i] not in operators:
                 if (i != 0 and i != len(query_list) - 1):
                     if (query_list[i - 1] not in operators and query_list[i + 1] not in operators):
-                        #qurey_search_body() and query_search_subj()
-                        break
+                        subj_list = query_search_terms("subj", query_list[i])
+                        body_list = query_search_terms("body", query_list[i])
+                        terms_list = subj_list + body_list
+                        id_list = intersect_lists(id_list, terms_list)
+
                 elif i == 0 and i != len(query_list) -1:
                     if query_list[i+1] not in operators:
-                        break
+                        subj_list = query_search_terms("subj", query_list[i])
+                        body_list = query_search_terms("body", query_list[i])
+                        terms_list = subj_list + body_list
+                        id_list = intersect_lists(id_list, terms_list)
+
                 elif i != 0 and i == len(query_list) -1:
                     if query_list[i-1] not in operators:
-                        break
-                else:
-                    break
+                        subj_list = query_search_terms("subj", query_list[i])
+                        body_list = query_search_terms("body", query_list[i])
+                        terms_list = subj_list + body_list
+                        id_list = intersect_lists(id_list, terms_list)
+
+                elif i == 0 and i == len(query_list) - 1:
+                    subj_list = query_search_terms("subj", query_list[i])
+                    body_list = query_search_terms("body", query_list[i])
+                    terms_list = subj_list + body_list
+                    id_list = intersect_lists(id_list, terms_list)
                 
         # Print out info from recs based on gathered row ids
         query_search_recs(output, id_list)
@@ -219,7 +224,7 @@ def query_search_emails(type, email):
     return emails_list
 
 
-def query_search_dates(type, date, opr):
+def query_search_dates(date, opr):
         
     DB_FILE = "da.idx"
     database = db.DB()
@@ -286,6 +291,14 @@ def query_search_dates(type, date, opr):
         
     database.close()
     return dates_list
+
+def intersect_lists(current_id_list, compare_id_list):
+    if len(current_id_list) == 0:
+        id_list = current_id_list + compare_id_list
+    else:
+        id_list = list(set(current_id_list).intersection(compare_id_list))
+    
+    return id_list
 
 if __name__ == "__main__":
     main()
