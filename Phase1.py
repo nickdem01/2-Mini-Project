@@ -11,7 +11,7 @@ def main():
 
 
 def create_files():
-    fp = open("test1.xml", "r")
+    fp = open("1k.xml", "r")
 
     dates_file = open("dates.txt", "w")
     dates_file.close()
@@ -58,7 +58,7 @@ def write_dates(date, row_num, dates_file):
 def write_recs(line, row_num, recs_file):
 
     recs_file = open("recs.txt", "a")
-    recs_file.write(row_num + ":" + line + "\n")
+    recs_file.write(row_num + ":" + line)
 
     recs_file.close()
 
@@ -68,8 +68,11 @@ def write_recs(line, row_num, recs_file):
 
 def write_emails(email, row_num, emails_file, context):
 
+    email_list = email.split(",")
     emails_file = open("emails.txt", "a")
-    emails_file.write(context + "-" + email.lower() + ":" + row_num + "\n")
+
+    for i in range(len(email_list)):
+        emails_file.write(context + "-" + email_list[i].lower() + ":" + row_num + "\n")
 
     emails_file.close()
 
@@ -77,7 +80,7 @@ def write_terms(text, row_num, terms_file, context):
 
     terms_file = open("terms.txt", "a")
     
-    body = re.split('[\s|; |, |: |( |) |\ |/ |? |! |\" |\' |{ |} |\[ |\] |* |@ |% |& |# |+ |^ |` |~ |< |> |\| |= |$ |\.]', text)
+    body = re.split(r'[\s|; |, |: |( |) |\\ |\ |/ |? |! |\" |\' |{ |} |\[ |\] |* |@ |% |& |# |+ |^ |` |~ |< |> |\| |= |$ |\.]', text)
 
     for i in range(len(body)):
   
@@ -85,22 +88,6 @@ def write_terms(text, row_num, terms_file, context):
         
         if(len(body[i]) > 2 and body[i] != 'apos' and body[i] != 'quot' and body[i] != 'amp'):
             
-            #if(body[i].isalnum() == False):
-                 
-                #temp = body[i].split("&")
-                #body[i] = temp[0]	
-                #valid = 0
-                #for b in range(len(body[i])):
-
-                    #if((body[i][b] != '-' or body[i][b] != '_') and len(body[i]) <= 2):
-       
-                        #valid = 1
-                        
-                #if(valid == 0):
-                   #term = body[i].lower()                
-                   #terms_file.write(context[0] + '-' + term + ':' + row_num +  "\n")
-            #else:
-                #terms_file.write(context[0] + '-' + term + ':' + row_num  + "\n")
             terms_file.write(context[0] + '-' + term + ':' + row_num  + "\n")
 
     terms_file.close()
