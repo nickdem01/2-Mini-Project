@@ -1,5 +1,4 @@
 import sys
-from bsddb3 import db
 import re
 
 def main():
@@ -11,7 +10,11 @@ def main():
 
 
 def create_files():
-    fp = open("1k.xml", "r")
+    try:
+        fp = open(sys.argv[1], "r")
+    except:
+        print("Missing Arguments")
+        sys.exit()
 
     dates_file = open("dates.txt", "w")
     dates_file.close()
