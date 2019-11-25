@@ -12,11 +12,11 @@ def main():
         print("Welcome to Query Selection\nType Exit to quit program\nType output=full for full record or output=brief for id and title only\n")
         command = input("Please enter a query: ")
         if command.lower() == "exit":
-            exit_command = True
+             sys.exit()
         elif command.lower() == "output=full":
             output = "full"
         elif command.lower() == "output=brief":
-            output = "breif"
+            output = "brief"
 
         command = re.sub(r"(\w)([:<>]|>=|<=)(\w)", r"\1 \2 \3", command)
         command = re.sub(r"(\w)([:<>]|>=|<=)(\s)", r"\1 \2 \3", command)
@@ -77,7 +77,7 @@ def main():
         query_search_recs(output, id_list)
 
 
-    sys.exit()
+   
 
 # Passes type value of either subj or body and the term key we are searching for.
 # Return a list of key row ids that match up with our terms.
@@ -100,11 +100,7 @@ def query_search_terms(type, term):
             column = iter
             if column[0].decode("utf-8") == term:
                 terms_list.append(column[1].decode("utf-8"))
-            
-                dup = cur.next_dup()
-                while(dup!=None):
-                    terms_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
+            else:
                 break
             
             iter = cur.next()
@@ -119,16 +115,11 @@ def query_search_terms(type, term):
         iter = cur.set_range(term.encode("utf-8"))
         while(iter):
             column = iter
-            
             if column[0].decode("utf-8").startswith(term):
                 terms_list.append(column[1].decode("utf-8"))
-
-                dup = cur.next_dup()
-                while(dup!=None):
-                    terms_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
+            else: 
                 break
-        
+
             iter = cur.next()
       
     database.close()
@@ -183,7 +174,7 @@ def query_search_recs(output_type, id_list):
 
             term_list = ["", "", "", "", "", "", ""]
 
-
+    database.close()
     return
 
 def query_search_emails(type, email):
@@ -212,12 +203,9 @@ def query_search_emails(type, email):
         column = iter
         if column[0].decode("utf-8") == email:
             emails_list.append(column[1].decode("utf-8"))
-            
-            dup = cur.next_dup()
-            while(dup!=None):
-                emails_list.append(dup[1].decode("utf-8"))
-                dup = cur.next_dup()
+        else:
             break
+        
         iter = cur.next()
     
     database.close()
@@ -241,53 +229,50 @@ def query_search_dates(date, opr):
             
             if column[0].decode("utf-8") > date:
                 dates_list.append(column[1].decode("utf-8"))
-                dup = cur.next_dup()
-                while(dup!=None):
-                    dates_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
+            elif column[0].decode("utf-8") != date and column[0].decode("utf-8") < date:
                 break
+
+            iter = cur.next()
                 
         if opr == '<':
                     
             if column[0].decode("utf-8") < date:
                 dates_list.append(column[1].decode("utf-8"))
-                dup = cur.next_dup()
-                while(dup!=None):
-                    dates_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
-                break                
+            elif column[0].decode("utf-8") != date and column[0].decode("utf-8") > date:
+                break
+
+            iter = cur.prev()
+
         if opr == '>=':
                     
             if column[0].decode("utf-8") >= date:
                 dates_list.append(column[1].decode("utf-8"))
-                dup = cur.next_dup()
-                while(dup!=None):
-                    dates_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
-                break             
+            else:
+                break
+
+            iter = cur.next()         
             
         if opr == '<=':
                     
-            if column[0].decode("utf-8") <= date:
+            if column[0].decode("utf-8") == date:
                 dates_list.append(column[1].decode("utf-8"))
-
-                dup = cur.next_dup()
-                while(dup!=None):
-                    dates_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
-                break             
+                iter = cur.next()
+            elif column[0].decode("utf-8") > date:
+                iter = cur.set_range(date.encode("utf-8"))
+                iter = cur.prev()
+            elif column[0].decode("utf-8") < date:
+                dates_list.append(column[1].decode("utf-8"))
+                iter = cur.prev()           
 
         if opr == ':':
                     
             if column[0].decode("utf-8") == date:
                 dates_list.append(column[1].decode("utf-8"))
-                dup = cur.next_dup()
-                while(dup!=None):
-                    dates_list.append(dup[1].decode("utf-8"))
-                    dup = cur.next_dup()
+            else:
                 break
+
+            iter = cur.next()
                 
-        iter = cur.next()
         
     database.close()
     return dates_list
